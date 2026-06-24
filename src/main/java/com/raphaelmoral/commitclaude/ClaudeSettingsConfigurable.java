@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.ui.components.JBPasswordField;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
@@ -29,11 +30,17 @@ public class ClaudeSettingsConfigurable implements Configurable {
             "claude-haiku-4-5-20251001",
     };
 
-    private static final String AUTH_CLI_LABEL = "Claude Code (login do WSL — sem API key)";
+    private static final String AUTH_CLI_LABEL = "Claude Code (CLI — sem API key)";
     private static final String AUTH_API_LABEL = "API key da Anthropic";
+
+    // Ambiente da CLI no Windows: rótulo exibido <-> valor salvo em State.cliRuntime.
+    private static final String RUNTIME_AUTO_LABEL = "Automático (detecta Windows ou WSL)";
+    private static final String RUNTIME_WINDOWS_LABEL = "Windows nativo (cmd/PowerShell)";
+    private static final String RUNTIME_WSL_LABEL = "WSL";
 
     private ComboBox<String> authModeCombo;
     private JBTextField cliExecutableField;
+    private ComboBox<String> cliRuntimeCombo;
     private JButton testButton;
     private JBPasswordField apiKeyField;
     private ComboBox<String> modelCombo;
@@ -51,6 +58,8 @@ public class ClaudeSettingsConfigurable implements Configurable {
     public @Nullable JComponent createComponent() {
         authModeCombo = new ComboBox<>(new String[]{AUTH_CLI_LABEL, AUTH_API_LABEL});
         cliExecutableField = new JBTextField();
+        cliRuntimeCombo = new ComboBox<>(new String[]{
+                RUNTIME_AUTO_LABEL, RUNTIME_WINDOWS_LABEL, RUNTIME_WSL_LABEL});
         testButton = new JButton("Testar login");
         testButton.addActionListener(e -> runCliTest());
 
@@ -68,10 +77,16 @@ public class ClaudeSettingsConfigurable implements Configurable {
         cliRow.add(testButton, BorderLayout.EAST);
 
         authModeCombo.addActionListener(e -> updateEnablement());
+        cliRuntimeCombo.addActionListener(e -> updateEnablement());
 
-        panel = FormBuilder.createFormBuilder()
+        FormBuilder builder = FormBuilder.createFormBuilder()
                 .addLabeledComponent("Login:", authModeCombo, 1, false)
-                .addLabeledComponent("Executável da CLI:", cliRow, 1, false)
+                .addLabeledComponent("Executável da CLI:", cliRow, 1, false);
+        // O ambiente da CLI só faz diferença quando o PyCharm roda no Windows.
+        if (SystemInfo.isWindows) {
+            builder.addLabeledComponent("Ambiente da CLI:", cliRuntimeCombo, 1, false);
+        }
+        panel = builder
                 .addLabeledComponent("API key (Anthropic):", apiKeyField, 1, false)
                 .addLabeledComponent("Modelo:", modelCombo, 1, false)
                 .addLabeledComponent("Idioma da mensagem:", languageField, 1, false)
@@ -89,8 +104,30 @@ public class ClaudeSettingsConfigurable implements Configurable {
     private void updateEnablement() {
         boolean cli = AUTH_CLI_LABEL.equals(authModeCombo.getItem());
         cliExecutableField.setEnabled(cli);
+        cliRuntimeCombo.setEnabled(cli);
         testButton.setEnabled(cli);
         apiKeyField.setEnabled(!cli);
+    }
+
+    private String selectedCliRuntime() {
+        Object item = cliRuntimeCombo.getItem();
+        if (RUNTIME_WINDOWS_LABEL.equals(item)) {
+            return "windows";
+        }
+        if (RUNTIME_WSL_LABEL.equals(item)) {
+            return "wsl";
+        }
+        return "auto";
+    }
+
+    private static String runtimeLabel(String value) {
+        if ("windows".equals(value)) {
+            return RUNTIME_WINDOWS_LABEL;
+        }
+        if ("wsl".equals(value)) {
+            return RUNTIME_WSL_LABEL;
+        }
+        return RUNTIME_AUTO_LABEL;
     }
 
     /** Roda um ping na CLI em background e mostra o resultado, sem travar a UI. */
@@ -98,6 +135,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         ClaudeSettings.State probe = new ClaudeSettings.State();
         probe.model = String.valueOf(modelCombo.getItem()).trim();
         probe.cliExecutable = cliExecutableField.getText().trim();
+        probe.cliRuntime = selectedCliRuntime();
 
         testButton.setEnabled(false);
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -134,6 +172,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         ClaudeSettings.State st = s.getState();
         return !selectedAuthMode().equals(st.authMode)
                 || !cliExecutableField.getText().equals(st.cliExecutable)
+                || !selectedCliRuntime().equals(st.cliRuntime)
                 || !new String(apiKeyField.getPassword()).equals(s.getApiKey())
                 || !String.valueOf(modelCombo.getItem()).equals(st.model)
                 || !languageField.getText().equals(st.language)
@@ -147,6 +186,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         ClaudeSettings.State st = s.getState();
         st.authMode = selectedAuthMode();
         st.cliExecutable = cliExecutableField.getText().trim();
+        st.cliRuntime = selectedCliRuntime();
         s.setApiKey(new String(apiKeyField.getPassword()));
         st.model = String.valueOf(modelCombo.getItem()).trim();
         st.language = languageField.getText().trim();
@@ -164,6 +204,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         ClaudeSettings.State st = s.getState();
         authModeCombo.setItem("api".equals(st.authMode) ? AUTH_API_LABEL : AUTH_CLI_LABEL);
         cliExecutableField.setText(st.cliExecutable);
+        cliRuntimeCombo.setItem(runtimeLabel(st.cliRuntime));
         apiKeyField.setText(s.getApiKey());
         modelCombo.setItem(st.model);
         languageField.setText(st.language);

@@ -26,6 +26,13 @@ public final class ClaudeSettings implements PersistentStateComponent<ClaudeSett
         public String authMode = "cli";
         /** Executável da CLI do Claude Code (normalmente "claude"). */
         public String cliExecutable = "claude";
+        /**
+         * Onde a CLI do Claude Code roda quando o PyCharm está no Windows:
+         * "auto" = detecta (Windows nativo se "claude" estiver no PATH, senão WSL),
+         * "windows" = cmd.exe/PowerShell nativo, "wsl" = dentro do WSL.
+         * Ignorado fora do Windows (sempre usa o shell nativo).
+         */
+        public String cliRuntime = "auto";
         public String model = "claude-opus-4-8";
         public int maxTokens = 1024;
         public String language = "pt-BR";

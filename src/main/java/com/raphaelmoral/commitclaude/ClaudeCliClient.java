@@ -16,9 +16,11 @@ import java.util.concurrent.TimeUnit;
  * o login já feito no WSL/terminal — sem precisar de API key.
  *
  * <p>O prompt (instruções + diff) é enviado pelo <em>stdin</em>, evitando problemas de
- * escape e de tamanho de linha de comando. Em PyCharm no Windows, a CLI é invocada dentro
- * do WSL ({@code wsl.exe bash -lc 'claude -p'}); em PyCharm rodando no próprio Linux/WSL,
- * é chamada direto via {@code bash -lc}.</p>
+ * escape e de tamanho de linha de comando. Em PyCharm no Windows, a CLI pode rodar
+ * nativamente ({@code cmd.exe /c claude -p}, que também cobre quem instalou via PowerShell)
+ * ou dentro do WSL ({@code wsl.exe bash -lc 'claude -p'}); o ambiente é escolhido pelo
+ * setting {@code cliRuntime} ("auto" detecta qual está disponível). Em PyCharm rodando no
+ * próprio Linux/macOS, é chamada direto via {@code bash -lc}.</p>
  */
 public final class ClaudeCliClient {
 
@@ -77,32 +79,72 @@ public final class ClaudeCliClient {
         if (exit != 0) {
             String detail = !err.toString().isBlank() ? err.toString() : stdout;
             throw new RuntimeException("A CLI do Claude retornou código " + exit + ":\n" + detail.trim()
-                    + "\n\nDica: rode 'claude' uma vez no terminal do WSL para confirmar que está logado.");
+                    + "\n\nDica: rode 'claude' uma vez no terminal (Windows ou WSL, conforme o ambiente"
+                    + " escolhido em Settings) para confirmar que está logado.");
         }
         return stdout.trim();
     }
 
     private static List<String> buildCommand(ClaudeSettings.State s) {
         String exe = (s.cliExecutable == null || s.cliExecutable.isBlank()) ? "claude" : s.cliExecutable.trim();
-        StringBuilder inner = new StringBuilder(exe).append(" -p");
+        List<String> args = new ArrayList<>();
+        args.add(exe);
+        args.add("-p");
         if (s.model != null && !s.model.isBlank()) {
-            inner.append(" --model ").append(s.model.trim());
+            args.add("--model");
+            args.add(s.model.trim());
         }
 
-        List<String> command = new ArrayList<>();
-        if (SystemInfo.isWindows) {
-            // PyCharm no Windows: a CLI (e o login) vivem dentro do WSL.
-            command.add("wsl.exe");
-            command.add("bash");
-            command.add("-lc");
-            command.add(inner.toString());
-        } else {
-            // PyCharm rodando no próprio Linux/WSL.
-            command.add("bash");
-            command.add("-lc");
-            command.add(inner.toString());
+        if (!SystemInfo.isWindows) {
+            // PyCharm rodando no próprio Linux/macOS (login shell carrega o PATH do Claude Code).
+            return List.of("bash", "-lc", String.join(" ", args));
         }
-        return command;
+
+        if ("windows".equals(resolveWindowsRuntime(s))) {
+            // Claude Code instalado nativamente no Windows. O npm cria um shim "claude.cmd",
+            // por isso passamos por cmd.exe /c (que também atende quem usa PowerShell — é o
+            // mesmo executável). Os args não contêm conteúdo do usuário (o prompt vai por stdin).
+            List<String> command = new ArrayList<>();
+            command.add("cmd.exe");
+            command.add("/c");
+            command.addAll(args);
+            return command;
+        }
+
+        // WSL: a CLI (e o login) vivem dentro do WSL.
+        return List.of("wsl.exe", "bash", "-lc", String.join(" ", args));
+    }
+
+    /**
+     * Decide se, no Windows, a CLI roda nativamente ("windows") ou no WSL ("wsl").
+     * No modo "auto", considera nativa se o executável estiver no PATH do Windows.
+     */
+    private static String resolveWindowsRuntime(ClaudeSettings.State s) {
+        String mode = (s.cliRuntime == null || s.cliRuntime.isBlank()) ? "auto" : s.cliRuntime.trim();
+        if ("windows".equals(mode) || "wsl".equals(mode)) {
+            return mode;
+        }
+        String exe = (s.cliExecutable == null || s.cliExecutable.isBlank()) ? "claude" : s.cliExecutable.trim();
+        return isOnWindowsPath(exe) ? "windows" : "wsl";
+    }
+
+    /** {@code where <exe>} no Windows: exit 0 quando o executável existe no PATH. */
+    private static boolean isOnWindowsPath(String exe) {
+        try {
+            Process p = new ProcessBuilder("cmd.exe", "/c", "where", exe)
+                    .redirectErrorStream(true)
+                    .start();
+            if (!p.waitFor(5, TimeUnit.SECONDS)) {
+                p.destroyForcibly();
+                return false;
+            }
+            return p.exitValue() == 0;
+        } catch (IOException | InterruptedException e) {
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            return false;
+        }
     }
 
     private static String readAll(InputStream in) throws IOException {
