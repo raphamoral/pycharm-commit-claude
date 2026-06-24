@@ -1,0 +1,8 @@
+# Normalização de fim de linha
+* text=auto eol=lf
+
+# Scripts e binários específicos
+*.bat text eol=crlf
+gradlew text eol=lf
+*.jar binary
+*.svg text eol=lf
