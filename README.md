@@ -1,84 +1,93 @@
-# Claude Commit Message — Plugin para PyCharm / IntelliJ
+# Claude Commit Message — PyCharm / IntelliJ Plugin
 
-Adiciona um botão na barra de ferramentas da **mensagem de commit** (o mesmo lugar onde
-aparece o botão da *AI Assistant*). Ao clicar, o plugin pega o diff dos arquivos do commit,
-manda para a **Claude** (API da Anthropic) e escreve a mensagem de commit gerada no campo.
+Adds a button to the **commit message** toolbar (the same spot where the *AI Assistant*
+button shows up). On click, the plugin grabs the diff of the commit's files, sends it to
+**Claude**, and writes the generated commit message into the field.
 
-## Como funciona
+## How it works
 
-1. O botão é registrado no grupo de ações `Vcs.MessageActionGroup`, que é a barrinha de
-   ícones ao lado do campo de mensagem de commit.
-2. Ao clicar, ele coleta os `Change`s (alterações selecionadas, ou a changelist padrão se
-   nada estiver selecionado) e gera um *unified diff* com a mesma engine do "Create Patch".
-3. Faz um `POST` para `https://api.anthropic.com/v1/messages` com o diff.
-4. O texto retornado vai direto para o campo de commit.
+1. The button is registered in the `Vcs.MessageActionGroup` action group — the little icon
+   bar next to the commit message field.
+2. On click, it collects the `Change`s (the selected changes, or the default changelist if
+   nothing is selected) and builds a *unified diff* using the same engine as "Create Patch".
+3. It sends the diff to Claude — either through the **Claude Code CLI** (reusing your existing
+   login) or via a `POST` to `https://api.anthropic.com/v1/messages` with an API key.
+4. The returned text goes straight into the commit field.
 
-A API key é guardada no **PasswordSafe** da IDE (keychain do SO), não em arquivo de config.
+## Requirements
 
-## Pré-requisitos
+- IntelliJ IDEA or PyCharm **2024.2+** (to open/build the project — it ships its own JDK).
+- Either the **Claude Code CLI** installed and logged in, or an **Anthropic API key**
+  (https://console.anthropic.com/).
 
-- IntelliJ IDEA ou PyCharm **2024.2+** (para abrir/buildar o projeto — ele traz o JDK).
-- Uma **API key da Anthropic** (https://console.anthropic.com/).
+> You don't need Java/Gradle installed on your system: when you open the project in IntelliJ,
+> it uses the bundled JBR and provisions JDK 21 through the toolchain automatically.
 
-> Não é necessário ter Java/Gradle instalados no sistema: ao abrir o projeto no IntelliJ,
-> ele usa o JBR embutido e provisiona o JDK 21 via toolchain automaticamente.
+## Build & run (development)
 
-## Build e execução (desenvolvimento)
+Open the folder in IntelliJ IDEA as a Gradle project. Then, in the **Gradle** tab:
 
-Abra a pasta no IntelliJ IDEA como projeto Gradle. Depois, na aba **Gradle**:
+- **`runIde`** — launches a sandbox PyCharm Community instance with the plugin installed.
+  Open any project with Git, go to the commit view, and the button (Claude icon) shows up
+  next to the message field.
+- **`buildPlugin`** — produces the distributable `.zip` in `build/distributions/`.
 
-- **`runIde`** — sobe uma instância sandbox do PyCharm Community já com o plugin instalado.
-  Abra qualquer projeto com Git, vá no commit e o botão (ícone do Claude) estará ao lado
-  do campo de mensagem.
-- **`buildPlugin`** — gera o `.zip` distribuível em `build/distributions/`.
-
-Pela linha de comando (se tiver Java 21 + Gradle, ou gerar o wrapper com `gradle wrapper`):
+From the command line (with Java 21 + Gradle, or after generating the wrapper with
+`gradle wrapper`):
 
 ```bash
-./gradlew runIde       # roda em sandbox
-./gradlew buildPlugin   # gera o zip
+./gradlew runIde        # run in a sandbox
+./gradlew buildPlugin   # build the zip
 ```
 
-## Instalar no seu PyCharm do dia a dia
+## Install into your everyday PyCharm
 
-1. Rode `buildPlugin` e pegue o zip em `build/distributions/claude-commit-message-0.1.0.zip`.
-2. No PyCharm: **Settings > Plugins > ⚙ > Install Plugin from Disk...** e selecione o zip.
-3. Reinicie. Vá em **Settings > Tools > Claude Commit Message** e cole a API key.
+1. Run `buildPlugin` and grab the zip at `build/distributions/claude-commit-message-0.1.0.zip`.
+2. In PyCharm: **Settings > Plugins > ⚙ > Install Plugin from Disk...** and pick the zip.
+3. Restart. Go to **Settings > Tools > Claude Commit Message** and configure the login.
 
 ## Login
 
-Há dois modos de autenticação (em **Settings > Tools > Claude Commit Message > Login**):
+There are two authentication modes (under **Settings > Tools > Claude Commit Message > Login**):
 
-- **Claude Code (CLI) — padrão:** reaproveita o login que você já fez no Claude Code no WSL/terminal.
-  Não precisa de API key. O plugin chama `claude -p` (no Windows, via `wsl.exe`) e usa o diff como prompt.
-  Use o botão **Testar login** para validar. Pré-requisito: ter o Claude Code instalado e logado
-  (rode `claude` uma vez no terminal).
-- **API key da Anthropic:** modo clássico, batendo direto em `api.anthropic.com`. A key é guardada no
-  PasswordSafe (keychain do SO).
+- **Claude Code (CLI) — default:** reuses the login you already did with Claude Code in your
+  terminal. No API key needed. The plugin calls `claude -p` and feeds the diff as the prompt.
+  Use the **Test login** button to validate. Prerequisite: have Claude Code installed and
+  logged in (run `claude` once in a terminal).
+  - On Windows, the **CLI runtime** setting controls where it runs: `auto` (use a native
+    `claude` on the `PATH`, otherwise fall back to WSL), `windows` (native cmd/PowerShell),
+    or `wsl` (run inside WSL). Outside Windows it always uses the native shell.
+- **Anthropic API key:** the classic mode, hitting `api.anthropic.com` directly. The key is
+  stored in the IDE **PasswordSafe** (OS keychain), not in a config file.
 
-## Configuração (Settings > Tools > Claude Commit Message)
+## Configuration (Settings > Tools > Claude Commit Message)
 
-| Campo | Descrição |
+| Field | Description |
 |---|---|
-| Login | `Claude Code (CLI)` (padrão, login do WSL) ou `API key da Anthropic`. |
-| Executável da CLI | Nome/caminho do binário da CLI (padrão `claude`). Só usado no modo CLI. |
-| API key | Sua chave da Anthropic (guardada no keychain). Só usada no modo API key. |
-| Modelo | `claude-opus-4-8` (padrão), `claude-sonnet-4-6`, `claude-haiku-4-5-...` ou outro id. |
-| Idioma da mensagem | Idioma da mensagem gerada (ex: `pt-BR`, `en`). |
-| Max tokens | Tamanho máximo da resposta (modo API key). |
-| Instruções adicionais | Texto livre anexado ao prompt do sistema (ex: convenções do time). |
+| Login | `Claude Code (CLI)` (default) or `Anthropic API key`. |
+| CLI executable | Name/path of the CLI binary (default `claude`). CLI mode only. |
+| CLI runtime | On Windows: `auto` / `windows` / `wsl`. CLI mode only. |
+| API key | Your Anthropic key (stored in the keychain). API key mode only. |
+| Model | `claude-opus-4-8` (default), `claude-sonnet-4-6`, `claude-haiku-4-5-...` or another id. |
+| Message language | Language of the generated message (e.g. `pt-BR`, `en`). |
+| Max tokens | Maximum response size (API key mode). |
+| Extra instructions | Free text appended to the system prompt (e.g. team conventions). |
 
-## Estrutura
+## Project layout
 
 ```
 src/main/java/com/raphaelmoral/commitclaude/
-  GenerateCommitMessageAction.java  # o botão / ação
+  GenerateCommitMessageAction.java  # the button / action
   DiffCollector.java                # Changes -> unified diff
-  Prompts.java                      # prompts (system/user) compartilhados
-  ClaudeClient.java                 # backend API key (HTTP à Messages API)
-  ClaudeCliClient.java              # backend CLI (claude -p, login do WSL)
-  ClaudeSettings.java               # persistência (State + PasswordSafe)
-  ClaudeSettingsConfigurable.java   # tela de Settings
-src/main/resources/icons/claude.svg # ícone do botão
+  Prompts.java                      # shared system/user prompts
+  ClaudeClient.java                 # API key backend (HTTP Messages API)
+  ClaudeCliClient.java              # CLI backend (claude -p, reuses your login)
+  ClaudeSettings.java               # persistence (State + PasswordSafe)
+  ClaudeSettingsConfigurable.java   # Settings screen
+src/main/resources/icons/claude.svg # button icon
 src/main/resources/META-INF/plugin.xml
 ```
+
+## License
+
+MIT — see [LICENSE](LICENSE). Developed by Raphael Moral Piazera.
