@@ -1,3 +1,5 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+
 plugins {
     id("java")
     // IntelliJ Platform Gradle Plugin 2.x
@@ -32,6 +34,13 @@ intellijPlatform {
         ideaVersion {
             sinceBuild = "242"
             untilBuild = "253.*"
+        }
+    }
+
+    // IDEs usados pelo verifyPlugin (verificador de compatibilidade da JetBrains).
+    pluginVerification {
+        ides {
+            ide(IntelliJPlatformType.PyCharmCommunity, "2024.2")
         }
     }
 

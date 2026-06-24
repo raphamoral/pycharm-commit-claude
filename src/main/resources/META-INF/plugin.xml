@@ -5,17 +5,18 @@
     <vendor email="raphamoraleng@gmail.com">Raphael Moral Piazera</vendor>
 
     <description><![CDATA[
-        <p><b>Português:</b> Adiciona um botão na barra de ferramentas da mensagem de commit (ao lado do
-        botão da AI Assistant). Ao clicar, o plugin coleta o diff dos arquivos incluídos no commit e gera
-        uma mensagem de commit com a Claude. Por padrão usa o login do <b>Claude Code (CLI)</b> já feito no
-        WSL — sem precisar de API key — mas também aceita uma API key da Anthropic. Configure em
-        <b>Settings &gt; Tools &gt; Claude Commit Message</b>.</p>
-        <p><b>English:</b> Adds a button to the commit message toolbar (next to the AI Assistant button).
-        On click, the plugin collects the diff of the files included in the commit and generates a commit
-        message with Claude. By default it reuses your existing <b>Claude Code (CLI)</b> login on WSL — no
-        API key required — but it also accepts an Anthropic API key. Configure it under
-        <b>Settings &gt; Tools &gt; Claude Commit Message</b>.</p>
-        <p>Desenvolvido por / Developed by <b>Raphael Moral Piazera</b>.</p>
+        Generates a Git commit message from your changes using Claude, right inside the commit dialog.
+        It adds a button to the commit message toolbar (next to the AI Assistant button). On click, the
+        plugin collects the diff of the files included in the commit and generates a commit message with
+        Claude. By default it reuses your existing <b>Claude Code (CLI)</b> login (no API key required),
+        but it also accepts an <b>Anthropic API key</b>. Configure it under
+        <b>Settings &gt; Tools &gt; Claude Commit Message</b>.
+        <br/><br/>
+        <b>Portugues:</b> Gera a mensagem de commit a partir do diff usando a Claude, direto no dialogo de
+        commit. Por padrao usa o login do Claude Code (CLI) ja feito no terminal (sem API key), mas tambem
+        aceita uma API key da Anthropic.
+        <br/><br/>
+        Developed by Raphael Moral Piazera.
     ]]></description>
 
     <!-- Plataforma + módulo de VCS (necessário para VcsDataKeys, CommitMessageI, etc.) -->
