@@ -1,19 +1,24 @@
-package com.bee2pay.commitclaude;
+package com.raphaelmoral.commitclaude;
 
+import com.intellij.ide.ActivityTracker;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vcs.VcsDataKeys;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
-import com.intellij.openapi.vcs.ui.CommitMessageI;
+import com.intellij.openapi.vcs.CommitMessageI;
+import com.intellij.ui.AnimatedIcon;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.Icon;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -27,6 +32,14 @@ public class GenerateCommitMessageAction extends AnAction {
 
     private static final String TITLE = "Claude Commit Message";
 
+    private static final Icon CLAUDE_ICON =
+            IconLoader.getIcon("/icons/claude.svg", GenerateCommitMessageAction.class);
+
+    private static final Icon SPINNER = AnimatedIcon.Default.INSTANCE;
+
+    /** true enquanto a geração está rodando — troca o ícone por um spinner e desabilita o botão. */
+    private volatile boolean running = false;
+
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;
@@ -34,9 +47,18 @@ public class GenerateCommitMessageAction extends AnAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
+        Presentation presentation = e.getPresentation();
+        if (running) {
+            presentation.setIcon(SPINNER);
+            presentation.setDisabledIcon(SPINNER);
+            presentation.setVisible(true);
+            presentation.setEnabled(false);
+            return;
+        }
+        presentation.setIcon(CLAUDE_ICON);
         boolean available = e.getProject() != null
                 && e.getData(VcsDataKeys.COMMIT_MESSAGE_CONTROL) != null;
-        e.getPresentation().setEnabledAndVisible(available);
+        presentation.setEnabledAndVisible(available);
     }
 
     @Override
@@ -77,7 +99,12 @@ public class GenerateCommitMessageAction extends AnAction {
                         throw new IllegalStateException("Não foi possível gerar o diff das alterações.");
                     }
                     ClaudeSettings settings = ClaudeSettings.getInstance();
-                    result = ClaudeClient.generateCommitMessage(diff, settings.getState(), settings.getApiKey());
+                    ClaudeSettings.State st = settings.getState();
+                    if ("api".equals(st.authMode)) {
+                        result = ClaudeClient.generateCommitMessage(diff, st, settings.getApiKey());
+                    } else {
+                        result = ClaudeCliClient.generateCommitMessage(diff, st);
+                    }
                 } catch (Exception ex) {
                     error = ex;
                 }
@@ -96,7 +123,16 @@ public class GenerateCommitMessageAction extends AnAction {
                     Messages.showWarningDialog(project, "A Claude retornou uma resposta vazia.", TITLE);
                 }
             }
+
+            @Override
+            public void onFinished() {
+                running = false;
+                ActivityTracker.getInstance().inc();
+            }
         }.queue();
+
+        running = true;
+        ActivityTracker.getInstance().inc();
     }
 
     /**

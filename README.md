@@ -28,7 +28,7 @@ A API key é guardada no **PasswordSafe** da IDE (keychain do SO), não em arqui
 Abra a pasta no IntelliJ IDEA como projeto Gradle. Depois, na aba **Gradle**:
 
 - **`runIde`** — sobe uma instância sandbox do PyCharm Community já com o plugin instalado.
-  Abra qualquer projeto com Git, vá no commit e o botão (ícone de lâmpada) estará ao lado
+  Abra qualquer projeto com Git, vá no commit e o botão (ícone do Claude) estará ao lado
   do campo de mensagem.
 - **`buildPlugin`** — gera o `.zip` distribuível em `build/distributions/`.
 
@@ -45,24 +45,40 @@ Pela linha de comando (se tiver Java 21 + Gradle, ou gerar o wrapper com `gradle
 2. No PyCharm: **Settings > Plugins > ⚙ > Install Plugin from Disk...** e selecione o zip.
 3. Reinicie. Vá em **Settings > Tools > Claude Commit Message** e cole a API key.
 
+## Login
+
+Há dois modos de autenticação (em **Settings > Tools > Claude Commit Message > Login**):
+
+- **Claude Code (CLI) — padrão:** reaproveita o login que você já fez no Claude Code no WSL/terminal.
+  Não precisa de API key. O plugin chama `claude -p` (no Windows, via `wsl.exe`) e usa o diff como prompt.
+  Use o botão **Testar login** para validar. Pré-requisito: ter o Claude Code instalado e logado
+  (rode `claude` uma vez no terminal).
+- **API key da Anthropic:** modo clássico, batendo direto em `api.anthropic.com`. A key é guardada no
+  PasswordSafe (keychain do SO).
+
 ## Configuração (Settings > Tools > Claude Commit Message)
 
 | Campo | Descrição |
 |---|---|
-| API key | Sua chave da Anthropic (guardada no keychain). |
+| Login | `Claude Code (CLI)` (padrão, login do WSL) ou `API key da Anthropic`. |
+| Executável da CLI | Nome/caminho do binário da CLI (padrão `claude`). Só usado no modo CLI. |
+| API key | Sua chave da Anthropic (guardada no keychain). Só usada no modo API key. |
 | Modelo | `claude-opus-4-8` (padrão), `claude-sonnet-4-6`, `claude-haiku-4-5-...` ou outro id. |
 | Idioma da mensagem | Idioma da mensagem gerada (ex: `pt-BR`, `en`). |
-| Max tokens | Tamanho máximo da resposta. |
+| Max tokens | Tamanho máximo da resposta (modo API key). |
 | Instruções adicionais | Texto livre anexado ao prompt do sistema (ex: convenções do time). |
 
 ## Estrutura
 
 ```
-src/main/java/com/bee2pay/commitclaude/
+src/main/java/com/raphaelmoral/commitclaude/
   GenerateCommitMessageAction.java  # o botão / ação
   DiffCollector.java                # Changes -> unified diff
-  ClaudeClient.java                 # chamada HTTP à Messages API
+  Prompts.java                      # prompts (system/user) compartilhados
+  ClaudeClient.java                 # backend API key (HTTP à Messages API)
+  ClaudeCliClient.java              # backend CLI (claude -p, login do WSL)
   ClaudeSettings.java               # persistência (State + PasswordSafe)
   ClaudeSettingsConfigurable.java   # tela de Settings
+src/main/resources/icons/claude.svg # ícone do botão
 src/main/resources/META-INF/plugin.xml
 ```

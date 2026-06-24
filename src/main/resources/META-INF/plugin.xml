@@ -1,14 +1,21 @@
 <idea-plugin>
-    <id>com.bee2pay.commit-claude</id>
+    <id>com.raphaelmoral.commitclaude</id>
     <name>Claude Commit Message</name>
     <version>0.1.0</version>
-    <vendor email="raphamoraleng@gmail.com">Bee2Pay</vendor>
+    <vendor email="raphamoraleng@gmail.com">Raphael Moral Piazera</vendor>
 
     <description><![CDATA[
-        Adiciona um botão na barra de ferramentas da mensagem de commit (ao lado do botão da AI Assistant).
-        Ao clicar, o plugin coleta o diff dos arquivos incluídos no commit e gera uma mensagem de commit
-        usando a API da Anthropic (Claude). Configure a API key e o modelo em
-        <b>Settings &gt; Tools &gt; Claude Commit Message</b>.
+        <p><b>Português:</b> Adiciona um botão na barra de ferramentas da mensagem de commit (ao lado do
+        botão da AI Assistant). Ao clicar, o plugin coleta o diff dos arquivos incluídos no commit e gera
+        uma mensagem de commit com a Claude. Por padrão usa o login do <b>Claude Code (CLI)</b> já feito no
+        WSL — sem precisar de API key — mas também aceita uma API key da Anthropic. Configure em
+        <b>Settings &gt; Tools &gt; Claude Commit Message</b>.</p>
+        <p><b>English:</b> Adds a button to the commit message toolbar (next to the AI Assistant button).
+        On click, the plugin collects the diff of the files included in the commit and generates a commit
+        message with Claude. By default it reuses your existing <b>Claude Code (CLI)</b> login on WSL — no
+        API key required — but it also accepts an Anthropic API key. Configure it under
+        <b>Settings &gt; Tools &gt; Claude Commit Message</b>.</p>
+        <p>Desenvolvido por / Developed by <b>Raphael Moral Piazera</b>.</p>
     ]]></description>
 
     <!-- Plataforma + módulo de VCS (necessário para VcsDataKeys, CommitMessageI, etc.) -->
@@ -18,17 +25,17 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable
                 parentId="tools"
-                id="com.bee2pay.commitclaude.settings"
-                instance="com.bee2pay.commitclaude.ClaudeSettingsConfigurable"
+                id="com.raphaelmoral.commitclaude.settings"
+                instance="com.raphaelmoral.commitclaude.ClaudeSettingsConfigurable"
                 displayName="Claude Commit Message"/>
     </extensions>
 
     <actions>
-        <action id="com.bee2pay.commitclaude.GenerateCommitMessageAction"
-                class="com.bee2pay.commitclaude.GenerateCommitMessageAction"
+        <action id="com.raphaelmoral.commitclaude.GenerateCommitMessageAction"
+                class="com.raphaelmoral.commitclaude.GenerateCommitMessageAction"
                 text="Gerar mensagem de commit com Claude"
                 description="Gera a mensagem de commit a partir do diff usando a Claude"
-                icon="AllIcons.Actions.IntentionBulb">
+                icon="/icons/claude.svg">
             <add-to-group group-id="Vcs.MessageActionGroup" anchor="first"/>
         </action>
     </actions>

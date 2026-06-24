@@ -1,4 +1,4 @@
-package com.bee2pay.commitclaude;
+package com.raphaelmoral.commitclaude;
 
 import com.intellij.openapi.diff.impl.patch.FilePatch;
 import com.intellij.openapi.diff.impl.patch.IdeaTextPatchBuilder;

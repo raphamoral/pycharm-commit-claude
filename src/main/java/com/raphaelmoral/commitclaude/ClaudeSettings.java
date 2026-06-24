@@ -1,4 +1,4 @@
-package com.bee2pay.commitclaude;
+package com.raphaelmoral.commitclaude;
 
 import com.intellij.credentialStore.CredentialAttributes;
 import com.intellij.credentialStore.CredentialAttributesKt;
@@ -22,6 +22,10 @@ import org.jetbrains.annotations.Nullable;
 public final class ClaudeSettings implements PersistentStateComponent<ClaudeSettings.State> {
 
     public static final class State {
+        /** "cli" = usa a CLI do Claude Code (login do WSL); "api" = usa a API key da Anthropic. */
+        public String authMode = "cli";
+        /** Executável da CLI do Claude Code (normalmente "claude"). */
+        public String cliExecutable = "claude";
         public String model = "claude-opus-4-8";
         public int maxTokens = 1024;
         public String language = "pt-BR";
