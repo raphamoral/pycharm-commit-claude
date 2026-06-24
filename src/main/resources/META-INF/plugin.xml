@@ -1,0 +1,35 @@
+<idea-plugin>
+    <id>com.bee2pay.commit-claude</id>
+    <name>Claude Commit Message</name>
+    <version>0.1.0</version>
+    <vendor email="raphamoraleng@gmail.com">Bee2Pay</vendor>
+
+    <description><![CDATA[
+        Adiciona um botão na barra de ferramentas da mensagem de commit (ao lado do botão da AI Assistant).
+        Ao clicar, o plugin coleta o diff dos arquivos incluídos no commit e gera uma mensagem de commit
+        usando a API da Anthropic (Claude). Configure a API key e o modelo em
+        <b>Settings &gt; Tools &gt; Claude Commit Message</b>.
+    ]]></description>
+
+    <!-- Plataforma + módulo de VCS (necessário para VcsDataKeys, CommitMessageI, etc.) -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.vcs</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+                parentId="tools"
+                id="com.bee2pay.commitclaude.settings"
+                instance="com.bee2pay.commitclaude.ClaudeSettingsConfigurable"
+                displayName="Claude Commit Message"/>
+    </extensions>
+
+    <actions>
+        <action id="com.bee2pay.commitclaude.GenerateCommitMessageAction"
+                class="com.bee2pay.commitclaude.GenerateCommitMessageAction"
+                text="Gerar mensagem de commit com Claude"
+                description="Gera a mensagem de commit a partir do diff usando a Claude"
+                icon="AllIcons.Actions.IntentionBulb">
+            <add-to-group group-id="Vcs.MessageActionGroup" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>
