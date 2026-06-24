@@ -34,6 +34,24 @@ intellijPlatform {
             untilBuild = "253.*"
         }
     }
+
+    // Assinatura do plugin (exigida pelo JetBrains Marketplace).
+    // Gere o par de chaves conforme https://plugins.jetbrains.com/docs/intellij/plugin-signing.html
+    // e exporte as variáveis de ambiente abaixo antes de rodar `./gradlew signPlugin`.
+    signing {
+        certificateChain = providers.environmentVariable("CERTIFICATE_CHAIN")
+        privateKey = providers.environmentVariable("PRIVATE_KEY")
+        password = providers.environmentVariable("PRIVATE_KEY_PASSWORD")
+    }
+
+    // Publicação no Marketplace. Pegue o token em
+    // https://plugins.jetbrains.com/author/me/tokens e exporte como PUBLISH_TOKEN.
+    // Depois rode `./gradlew publishPlugin`.
+    publishing {
+        token = providers.environmentVariable("PUBLISH_TOKEN")
+        // Canal "default" = público estável. Use "beta"/"eap" para canais separados.
+        channels = listOf("default")
+    }
 }
 
 java {
