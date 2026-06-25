@@ -1,4 +1,12 @@
-# Claude Commit Message — PyCharm / IntelliJ Plugin
+<p align="center">
+  <img src="src/main/resources/META-INF/pluginIcon.svg" width="96" alt="Claude Commit Message logo" />
+</p>
+
+<h1 align="center">Claude Commit Message</h1>
+
+<p align="center">PyCharm / IntelliJ plugin that writes your Git commit message with Claude.</p>
+
+---
 
 Adds a button to the **commit message** toolbar (the same spot where the *AI Assistant*
 button shows up). On click, the plugin grabs the diff of the commit's files, sends it to
@@ -28,7 +36,8 @@ button shows up). On click, the plugin grabs the diff of the commit's files, sen
 Open the folder in IntelliJ IDEA as a Gradle project. Then, in the **Gradle** tab:
 
 - **`runIde`** — launches a sandbox PyCharm Community instance with the plugin installed.
-  Open any project with Git, go to the commit view, and the button (Claude icon) shows up
+  
+- Open any project with Git, go to the commit view, and the button (Claude icon) shows up
   next to the message field.
 - **`buildPlugin`** — produces the distributable `.zip` in `build/distributions/`.
 
