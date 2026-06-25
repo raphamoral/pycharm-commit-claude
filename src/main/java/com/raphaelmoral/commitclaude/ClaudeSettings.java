@@ -33,6 +33,12 @@ public final class ClaudeSettings implements PersistentStateComponent<ClaudeSett
          * Ignorado fora do Windows (sempre usa o shell nativo).
          */
         public String cliRuntime = "auto";
+        /**
+         * Caminho do {@code bash.exe} do Git for Windows, usado para definir
+         * {@code CLAUDE_CODE_GIT_BASH_PATH} quando a CLI roda nativamente no Windows.
+         * Vazio = autodetecta nos locais padrão de instalação do Git. Ignorado fora do Windows.
+         */
+        public String gitBashPath = "";
         public String model = "claude-opus-4-8";
         public int maxTokens = 1024;
         public String language = "pt-BR";

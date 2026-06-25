@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.raphaelmoral"
-version = "0.1.1"
+version = "0.1.2"
 
 repositories {
     mavenCentral()
@@ -38,9 +38,8 @@ intellijPlatform {
 
         changeNotes = """
             <ul>
-              <li>New original plugin icon.</li>
-              <li>Native Windows (cmd/PowerShell) CLI runtime in addition to WSL.</li>
-              <li>Marketplace-compliant plugin description.</li>
+              <li>Auto-detect git-bash on native Windows and set CLAUDE_CODE_GIT_BASH_PATH so the CLI runs without manual setup; added an optional git-bash path setting.</li>
+              <li>On Windows "auto" mode, try the native and WSL runtimes in turn and fall back when one fails; the runtime that works is saved as the default. Only when both fail do we report that you're not logged in.</li>
             </ul>
         """.trimIndent()
     }

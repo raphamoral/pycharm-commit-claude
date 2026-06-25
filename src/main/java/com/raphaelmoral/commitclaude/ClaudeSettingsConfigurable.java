@@ -41,6 +41,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
     private ComboBox<String> authModeCombo;
     private JBTextField cliExecutableField;
     private ComboBox<String> cliRuntimeCombo;
+    private JBTextField gitBashPathField;
     private JButton testButton;
     private JBPasswordField apiKeyField;
     private ComboBox<String> modelCombo;
@@ -60,6 +61,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         cliExecutableField = new JBTextField();
         cliRuntimeCombo = new ComboBox<>(new String[]{
                 RUNTIME_AUTO_LABEL, RUNTIME_WINDOWS_LABEL, RUNTIME_WSL_LABEL});
+        gitBashPathField = new JBTextField();
         testButton = new JButton("Testar login");
         testButton.addActionListener(e -> runCliTest());
 
@@ -85,6 +87,11 @@ public class ClaudeSettingsConfigurable implements Configurable {
         // O ambiente da CLI só faz diferença quando o PyCharm roda no Windows.
         if (SystemInfo.isWindows) {
             builder.addLabeledComponent("Ambiente da CLI:", cliRuntimeCombo, 1, false);
+            builder.addLabeledComponent("git-bash (Windows nativo):", gitBashPathField, 1, false);
+            builder.addComponent(new com.intellij.ui.components.JBLabel(
+                    "Opcional. Vazio = detecta automaticamente. Ex.: C:\\Program Files\\Git\\bin\\bash.exe",
+                    com.intellij.util.ui.UIUtil.ComponentStyle.SMALL,
+                    com.intellij.util.ui.UIUtil.FontColor.BRIGHTER));
         }
         panel = builder
                 .addLabeledComponent("API key (Anthropic):", apiKeyField, 1, false)
@@ -105,6 +112,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         boolean cli = AUTH_CLI_LABEL.equals(authModeCombo.getItem());
         cliExecutableField.setEnabled(cli);
         cliRuntimeCombo.setEnabled(cli);
+        gitBashPathField.setEnabled(cli);
         testButton.setEnabled(cli);
         apiKeyField.setEnabled(!cli);
     }
@@ -136,6 +144,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         probe.model = String.valueOf(modelCombo.getItem()).trim();
         probe.cliExecutable = cliExecutableField.getText().trim();
         probe.cliRuntime = selectedCliRuntime();
+        probe.gitBashPath = gitBashPathField.getText().trim();
 
         testButton.setEnabled(false);
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -173,6 +182,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         return !selectedAuthMode().equals(st.authMode)
                 || !cliExecutableField.getText().equals(st.cliExecutable)
                 || !selectedCliRuntime().equals(st.cliRuntime)
+                || !gitBashPathField.getText().equals(st.gitBashPath == null ? "" : st.gitBashPath)
                 || !new String(apiKeyField.getPassword()).equals(s.getApiKey())
                 || !String.valueOf(modelCombo.getItem()).equals(st.model)
                 || !languageField.getText().equals(st.language)
@@ -187,6 +197,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         st.authMode = selectedAuthMode();
         st.cliExecutable = cliExecutableField.getText().trim();
         st.cliRuntime = selectedCliRuntime();
+        st.gitBashPath = gitBashPathField.getText().trim();
         s.setApiKey(new String(apiKeyField.getPassword()));
         st.model = String.valueOf(modelCombo.getItem()).trim();
         st.language = languageField.getText().trim();
@@ -205,6 +216,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         authModeCombo.setItem("api".equals(st.authMode) ? AUTH_API_LABEL : AUTH_CLI_LABEL);
         cliExecutableField.setText(st.cliExecutable);
         cliRuntimeCombo.setItem(runtimeLabel(st.cliRuntime));
+        gitBashPathField.setText(st.gitBashPath == null ? "" : st.gitBashPath);
         apiKeyField.setText(s.getApiKey());
         modelCombo.setItem(st.model);
         languageField.setText(st.language);
