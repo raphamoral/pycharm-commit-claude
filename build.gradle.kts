@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.raphaelmoral"
-version = "0.1.0"
+version = "0.1.1"
 
 repositories {
     mavenCentral()
@@ -35,6 +35,14 @@ intellijPlatform {
             sinceBuild = "242"
             untilBuild = "253.*"
         }
+
+        changeNotes = """
+            <ul>
+              <li>New original plugin icon.</li>
+              <li>Native Windows (cmd/PowerShell) CLI runtime in addition to WSL.</li>
+              <li>Marketplace-compliant plugin description.</li>
+            </ul>
+        """.trimIndent()
     }
 
     // IDEs usados pelo verifyPlugin (verificador de compatibilidade da JetBrains).
