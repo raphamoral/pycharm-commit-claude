@@ -30,6 +30,100 @@ public class ClaudeSettingsConfigurable implements Configurable {
             "claude-haiku-4-5-20251001",
     };
 
+    // Idiomas sugeridos (ISO 639-1 + variantes de locale comuns). O combo é editável,
+    // então qualquer outro valor também é aceito. "en-US" (default) e "pt-BR" ficam no topo
+    // por serem os mais usados; o restante segue em ordem alfabética de código.
+    private static final String[] LANGUAGES = {
+            "en-US",
+            "pt-BR",
+            "en",
+            "af",     // Afrikaans
+            "am",     // Amárico
+            "ar",     // Árabe
+            "az",     // Azerbaijano
+            "be",     // Bielorrusso
+            "bg",     // Búlgaro
+            "bn",     // Bengali
+            "bs",     // Bósnio
+            "ca",     // Catalão
+            "cs",     // Tcheco
+            "cy",     // Galês
+            "da",     // Dinamarquês
+            "de",     // Alemão
+            "de-AT",  // Alemão (Áustria)
+            "de-CH",  // Alemão (Suíça)
+            "el",     // Grego
+            "en-AU",  // Inglês (Austrália)
+            "en-CA",  // Inglês (Canadá)
+            "en-GB",  // Inglês (Reino Unido)
+            "en-US",  // Inglês (EUA)
+            "eo",     // Esperanto
+            "es",     // Espanhol
+            "es-419", // Espanhol (América Latina)
+            "es-MX",  // Espanhol (México)
+            "et",     // Estoniano
+            "eu",     // Basco
+            "fa",     // Persa
+            "fi",     // Finlandês
+            "fil",    // Filipino
+            "fr",     // Francês
+            "fr-CA",  // Francês (Canadá)
+            "ga",     // Irlandês
+            "gl",     // Galego
+            "gu",     // Guzerate
+            "he",     // Hebraico
+            "hi",     // Híndi
+            "hr",     // Croata
+            "hu",     // Húngaro
+            "hy",     // Armênio
+            "id",     // Indonésio
+            "is",     // Islandês
+            "it",     // Italiano
+            "ja",     // Japonês
+            "ka",     // Georgiano
+            "kk",     // Cazaque
+            "km",     // Khmer
+            "kn",     // Canarês
+            "ko",     // Coreano
+            "lo",     // Laosiano
+            "lt",     // Lituano
+            "lv",     // Letão
+            "mk",     // Macedônio
+            "ml",     // Malaiala
+            "mn",     // Mongol
+            "mr",     // Marata
+            "ms",     // Malaio
+            "my",     // Birmanês
+            "ne",     // Nepalês
+            "nl",     // Holandês
+            "no",     // Norueguês
+            "pa",     // Panjabi
+            "pl",     // Polonês
+            "pt",     // Português
+            "pt-PT",  // Português (Portugal)
+            "ro",     // Romeno
+            "ru",     // Russo
+            "si",     // Cingalês
+            "sk",     // Eslovaco
+            "sl",     // Esloveno
+            "sq",     // Albanês
+            "sr",     // Sérvio
+            "sv",     // Sueco
+            "sw",     // Suaíli
+            "ta",     // Tâmil
+            "te",     // Télugo
+            "th",     // Tailandês
+            "tr",     // Turco
+            "uk",     // Ucraniano
+            "ur",     // Urdu
+            "uz",     // Uzbeque
+            "vi",     // Vietnamita
+            "zh",     // Chinês
+            "zh-Hans",// Chinês (simplificado)
+            "zh-Hant",// Chinês (tradicional)
+            "zu",     // Zulu
+    };
+
     private static final String AUTH_CLI_LABEL = "Claude Code (CLI — sem API key)";
     private static final String AUTH_API_LABEL = "API key da Anthropic";
 
@@ -45,7 +139,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
     private JButton testButton;
     private JBPasswordField apiKeyField;
     private ComboBox<String> modelCombo;
-    private JBTextField languageField;
+    private ComboBox<String> languageCombo;
     private JBTextField maxTokensField;
     private JTextArea customInstructionsArea;
     private JPanel panel;
@@ -68,7 +162,8 @@ public class ClaudeSettingsConfigurable implements Configurable {
         apiKeyField = new JBPasswordField();
         modelCombo = new ComboBox<>(MODELS);
         modelCombo.setEditable(true);
-        languageField = new JBTextField();
+        languageCombo = new ComboBox<>(LANGUAGES);
+        languageCombo.setEditable(true);
         maxTokensField = new JBTextField();
         customInstructionsArea = new JTextArea(5, 40);
         customInstructionsArea.setLineWrap(true);
@@ -96,7 +191,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         panel = builder
                 .addLabeledComponent("API key (Anthropic):", apiKeyField, 1, false)
                 .addLabeledComponent("Modelo:", modelCombo, 1, false)
-                .addLabeledComponent("Idioma da mensagem:", languageField, 1, false)
+                .addLabeledComponent("Idioma da mensagem:", languageCombo, 1, false)
                 .addLabeledComponent("Max tokens:", maxTokensField, 1, false)
                 .addLabeledComponent("Instruções adicionais:", new JScrollPane(customInstructionsArea), 1, true)
                 .addComponentFillVertically(new JPanel(), 0)
@@ -185,7 +280,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
                 || !gitBashPathField.getText().equals(st.gitBashPath == null ? "" : st.gitBashPath)
                 || !new String(apiKeyField.getPassword()).equals(s.getApiKey())
                 || !String.valueOf(modelCombo.getItem()).equals(st.model)
-                || !languageField.getText().equals(st.language)
+                || !String.valueOf(languageCombo.getItem()).equals(st.language)
                 || !maxTokensField.getText().equals(String.valueOf(st.maxTokens))
                 || !customInstructionsArea.getText().equals(st.customInstructions);
     }
@@ -200,7 +295,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         st.gitBashPath = gitBashPathField.getText().trim();
         s.setApiKey(new String(apiKeyField.getPassword()));
         st.model = String.valueOf(modelCombo.getItem()).trim();
-        st.language = languageField.getText().trim();
+        st.language = String.valueOf(languageCombo.getItem()).trim();
         try {
             st.maxTokens = Integer.parseInt(maxTokensField.getText().trim());
         } catch (NumberFormatException ignored) {
@@ -219,7 +314,7 @@ public class ClaudeSettingsConfigurable implements Configurable {
         gitBashPathField.setText(st.gitBashPath == null ? "" : st.gitBashPath);
         apiKeyField.setText(s.getApiKey());
         modelCombo.setItem(st.model);
-        languageField.setText(st.language);
+        languageCombo.setItem(st.language);
         maxTokensField.setText(String.valueOf(st.maxTokens));
         customInstructionsArea.setText(st.customInstructions);
         updateEnablement();

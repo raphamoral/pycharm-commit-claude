@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.raphaelmoral.commitclaude</id>
     <name>Claude Commit Message</name>
-    <version>0.1.1</version>
+    <version>0.1.4</version>
     <vendor email="raphamoraleng@gmail.com">Raphael Moral Piazera</vendor>
 
     <description><![CDATA[
@@ -12,11 +12,13 @@
         but it also accepts an <b>Anthropic API key</b>. Configure it under
         <b>Settings &gt; Tools &gt; Claude Commit Message</b>.
         <br/><br/>
-        <b>Portugues:</b> Gera a mensagem de commit a partir do diff usando a Claude, direto no dialogo de
-        commit. Por padrao usa o login do Claude Code (CLI) ja feito no terminal (sem API key), mas tambem
-        aceita uma API key da Anthropic.
+        Messages are written in <b>English (en-US)</b> by default, and you can pick from around 90 supported
+        languages — including regional variants such as pt-BR, en-GB, es-419, fr-CA and zh-Hans/zh-Hant — or
+        type any other language code you need.
         <br/><br/>
-        Developed by Raphael Moral Piazera.
+        Developed by Raphael Moral Piazera —
+        <a href="https://github.com/raphamoral">GitHub</a> ·
+        <a href="https://www.linkedin.com/in/raphaelmoral/">LinkedIn</a>.
     ]]></description>
 
     <!-- Plataforma + módulo de VCS (necessário para VcsDataKeys, CommitMessageI, etc.) -->

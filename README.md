@@ -78,7 +78,7 @@ There are two authentication modes (under **Settings > Tools > Claude Commit Mes
 | CLI runtime | On Windows: `auto` / `windows` / `wsl`. CLI mode only. |
 | API key | Your Anthropic key (stored in the keychain). API key mode only. |
 | Model | `claude-opus-4-8` (default), `claude-sonnet-4-6`, `claude-haiku-4-5-...` or another id. |
-| Message language | Language of the generated message (e.g. `pt-BR`, `en`). |
+| Message language | Language of the generated message. Defaults to `en-US`; the picker lists ~90 languages (including regional variants like `pt-BR`, `en-GB`, `es-419`, `zh-Hans`) and is editable for any other code. |
 | Max tokens | Maximum response size (API key mode). |
 | Extra instructions | Free text appended to the system prompt (e.g. team conventions). |
 
@@ -99,4 +99,5 @@ src/main/resources/META-INF/plugin.xml
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Developed by Raphael Moral Piazera.
+MIT — see [LICENSE](LICENSE). Developed by Raphael Moral Piazera —
+[GitHub](https://github.com/raphamoral) · [LinkedIn](https://www.linkedin.com/in/raphaelmoral/).

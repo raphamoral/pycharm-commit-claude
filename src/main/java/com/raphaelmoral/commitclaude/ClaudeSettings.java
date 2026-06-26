@@ -41,7 +41,7 @@ public final class ClaudeSettings implements PersistentStateComponent<ClaudeSett
         public String gitBashPath = "";
         public String model = "claude-opus-4-8";
         public int maxTokens = 1024;
-        public String language = "pt-BR";
+        public String language = "en-US";
         public String customInstructions = "";
     }
 
