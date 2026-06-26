@@ -22,6 +22,7 @@ import javax.swing.Icon;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Botão na barra da mensagem de commit (grupo {@code Vcs.MessageActionGroup} — o mesmo
@@ -88,13 +89,13 @@ public class GenerateCommitMessageAction extends AnAction {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
-                    String diff = ReadAction.compute(() -> {
+                    String diff = ReadAction.nonBlocking((Callable<String>) () -> {
                         try {
                             return DiffCollector.buildDiff(project, changes);
                         } catch (Exception ex) {
                             throw new RuntimeException(ex);
                         }
-                    });
+                    }).executeSynchronously();
                     if (diff == null || diff.isBlank()) {
                         throw new IllegalStateException("Não foi possível gerar o diff das alterações.");
                     }

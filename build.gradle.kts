@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.raphaelmoral"
-version = "0.1.4"
+version = "0.1.5"
 
 repositories {
     mavenCentral()
@@ -38,6 +38,7 @@ intellijPlatform {
 
         changeNotes = """
             <ul>
+              <li>Replaced the deprecated ReadAction.compute(...) call with ReadAction.nonBlocking(...).executeSynchronously() to stay compatible with newer IDE builds.</li>
               <li>Commit message language picker now offers the full set of supported languages (around 90 entries, including regional variants such as en-GB, pt-PT, es-419, fr-CA and zh-Hans/zh-Hant). The field stays editable, so any other language code still works.</li>
               <li>Auto-detect git-bash on native Windows and set CLAUDE_CODE_GIT_BASH_PATH so the CLI runs without manual setup; added an optional git-bash path setting.</li>
               <li>On Windows "auto" mode, try the native and WSL runtimes in turn and fall back when one fails; the runtime that works is saved as the default. Only when both fail do we report that you're not logged in.</li>

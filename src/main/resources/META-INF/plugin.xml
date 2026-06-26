@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.raphaelmoral.commitclaude</id>
     <name>Claude Commit Message</name>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
     <vendor email="raphamoraleng@gmail.com">Raphael Moral Piazera</vendor>
 
     <description><![CDATA[
