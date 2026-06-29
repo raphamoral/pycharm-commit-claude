@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="60" viewBox="0 0 300 60" role="img" aria-label="Get from Marketplace">
+  <defs>
+    <linearGradient id="jbArrow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"   stop-color="#FF9419"/>
+      <stop offset="0.55" stop-color="#FF6B2C"/>
+      <stop offset="1"   stop-color="#FE2857"/>
+    </linearGradient>
+    <clipPath id="pill">
+      <rect x="0" y="0" width="300" height="60" rx="30" ry="30"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#pill)">
+    <!-- black pill body -->
+    <rect x="0" y="0" width="300" height="60" fill="#0A0A0A"/>
+
+    <!-- gradient arrow / marketplace mark on the right -->
+    <rect x="250" y="0" width="50" height="60" fill="url(#jbArrow)"/>
+    <polygon points="214,4 252,4 300,30 252,56 214,56 248,30" fill="url(#jbArrow)"/>
+    <!-- subtle fold for depth -->
+    <polygon points="248,30 252,56 285,44" fill="#000000" opacity="0.18"/>
+  </g>
+
+  <text x="34" y="36" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" font-weight="500" fill="#FFFFFF">Get from Marketplace</text>
+</svg>

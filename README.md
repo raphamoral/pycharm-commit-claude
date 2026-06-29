@@ -8,6 +8,15 @@
 
 ---
 
+<p align="center">
+  <a href="https://plugins.jetbrains.com/plugin/32472"><img src="assets/get-from-marketplace.png" alt="Get from JetBrains Marketplace" height="48" /></a>
+</p>
+
+<p align="center">
+  <a href="https://plugins.jetbrains.com/plugin/32472"><img src="https://img.shields.io/jetbrains/plugin/v/32472?label=Marketplace&logo=jetbrains" alt="JetBrains Marketplace version" /></a>
+  <a href="https://plugins.jetbrains.com/plugin/32472"><img src="https://img.shields.io/jetbrains/plugin/d/32472?label=Downloads" alt="JetBrains Marketplace downloads" /></a>
+</p>
+
 Adds a button to the **commit message** toolbar (the same spot where the *AI Assistant*
 button shows up). On click, the plugin grabs the diff of the commit's files, sends it to
 **Claude**, and writes the generated commit message into the field.
