@@ -40,6 +40,32 @@ button shows up). On click, the plugin grabs the diff of the commit's files, sen
 > You don't need Java/Gradle installed on your system: when you open the project in IntelliJ,
 > it uses the bundled JBR and provisions JDK 21 through the toolchain automatically.
 
+## Supported IDEs
+
+The plugin depends only on the IntelliJ Platform, so it runs on every JetBrains IDE
+(**2024.2 – 2025.3**):
+
+<p>
+  <img src="https://img.shields.io/badge/IntelliJ%20IDEA-000?logo=intellijidea&logoColor=white" alt="IntelliJ IDEA" />
+  <img src="https://img.shields.io/badge/IntelliJ%20IDEA%20Community-000?logo=intellijidea&logoColor=white" alt="IntelliJ IDEA Community" />
+  <img src="https://img.shields.io/badge/PyCharm-000?logo=pycharm&logoColor=white" alt="PyCharm" />
+  <img src="https://img.shields.io/badge/PyCharm%20Community-000?logo=pycharm&logoColor=white" alt="PyCharm Community" />
+  <img src="https://img.shields.io/badge/WebStorm-000?logo=webstorm&logoColor=white" alt="WebStorm" />
+  <img src="https://img.shields.io/badge/PhpStorm-000?logo=phpstorm&logoColor=white" alt="PhpStorm" />
+  <img src="https://img.shields.io/badge/GoLand-000?logo=goland&logoColor=white" alt="GoLand" />
+  <img src="https://img.shields.io/badge/RubyMine-000?logo=rubymine&logoColor=white" alt="RubyMine" />
+  <img src="https://img.shields.io/badge/CLion-000?logo=clion&logoColor=white" alt="CLion" />
+  <img src="https://img.shields.io/badge/RustRover-000?logo=jetbrains&logoColor=white" alt="RustRover" />
+  <img src="https://img.shields.io/badge/Rider-000?logo=rider&logoColor=white" alt="Rider" />
+  <img src="https://img.shields.io/badge/DataGrip-000?logo=datagrip&logoColor=white" alt="DataGrip" />
+  <img src="https://img.shields.io/badge/DataSpell-000?logo=jetbrains&logoColor=white" alt="DataSpell" />
+  <img src="https://img.shields.io/badge/MPS-000?logo=jetbrains&logoColor=white" alt="MPS" />
+  <img src="https://img.shields.io/badge/Android%20Studio-000?logo=androidstudio&logoColor=white" alt="Android Studio" />
+</p>
+
+> In the Marketplace download stats, the less common IDEs from this list are grouped under
+> the **"Other"** bucket rather than getting their own bar.
+
 ## Build & run (development)
 
 Open the folder in IntelliJ IDEA as a Gradle project. Then, in the **Gradle** tab:
