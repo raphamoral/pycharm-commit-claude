@@ -43,7 +43,7 @@ button shows up). On click, the plugin grabs the diff of the commit's files, sen
 ## Supported IDEs
 
 The plugin depends only on the IntelliJ Platform, so it runs on every JetBrains IDE
-(**2024.2 – 2025.3**):
+(**2023.3 and newer** — no upper version cap):
 
 <p>
   <img src="https://img.shields.io/badge/IntelliJ%20IDEA-000?logo=intellijidea&logoColor=white" alt="IntelliJ IDEA" />

@@ -26,4 +26,29 @@ final class Prompts {
     static String user(String diff) {
         return "Gere a mensagem de commit para o seguinte diff (formato unified diff):\n\n" + diff;
     }
+
+    /**
+     * Remove o code fence de markdown (```) que o modelo às vezes coloca ao redor
+     * da mensagem, mesmo instruído a não usar markdown. Se o texto começar com uma
+     * cerca (com ou sem tag de linguagem, ex.: ```text), tira a cerca de abertura e
+     * a de fechamento. Caso contrário, devolve o texto apenas com trim.
+     */
+    static String stripFences(String s) {
+        if (s == null) {
+            return null;
+        }
+        String t = s.trim();
+        if (!t.startsWith("```")) {
+            return t;
+        }
+        // Remove a primeira linha (```                       ou ```lang).
+        int firstNewline = t.indexOf('\n');
+        t = firstNewline >= 0 ? t.substring(firstNewline + 1) : t.substring(3);
+        // Remove a cerca de fechamento, se houver.
+        int closing = t.lastIndexOf("```");
+        if (closing >= 0) {
+            t = t.substring(0, closing);
+        }
+        return t.trim();
+    }
 }

@@ -106,6 +106,9 @@ public class GenerateCommitMessageAction extends AnAction {
                     } else {
                         result = ClaudeCliClient.generateCommitMessage(diff, st);
                     }
+                    // Tira o code fence de markdown que o modelo às vezes adiciona
+                    // apesar de instruído a não usar (cobre os dois backends).
+                    result = Prompts.stripFences(result);
                 } catch (Exception ex) {
                     error = ex;
                 }

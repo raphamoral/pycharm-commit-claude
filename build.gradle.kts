@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.raphaelmoral"
-version = "0.1.5"
+version = "0.1.6"
 
 repositories {
     mavenCentral()
@@ -32,12 +32,19 @@ dependencies {
 intellijPlatform {
     pluginConfiguration {
         ideaVersion {
-            sinceBuild = "242"
-            untilBuild = "253.*"
+            // Piso: 2023.3. IDEs 2023.3–2024.1 rodam no JBR 17, por isso compilamos
+            // o plugin em bytecode 17 (ver tasks.withType<JavaCompile> abaixo).
+            sinceBuild = "233"
+            // Sem teto: o plugin usa apenas APIs estáveis de plataforma/VCS, então fica
+            // compatível com builds futuras (243, 251, 252, 253, 261, ...) sem precisar
+            // republicar a cada release. provider { null } remove o atributo until-build
+            // (string vazia é inválida: escreve until-build="" e o validador rejeita).
+            untilBuild = provider { null }
         }
 
         changeNotes = """
             <ul>
+              <li>Strip Markdown code fences (```) that the model occasionally wraps around the message, so the commit field gets the plain message.</li>
               <li>Replaced the deprecated ReadAction.compute(...) call with ReadAction.nonBlocking(...).executeSynchronously() to stay compatible with newer IDE builds.</li>
               <li>Commit message language picker now offers the full set of supported languages (around 90 entries, including regional variants such as en-GB, pt-PT, es-419, fr-CA and zh-Hans/zh-Hant). The field stays editable, so any other language code still works.</li>
               <li>Auto-detect git-bash on native Windows and set CLAUDE_CODE_GIT_BASH_PATH so the CLI runs without manual setup; added an optional git-bash path setting.</li>
@@ -47,9 +54,11 @@ intellijPlatform {
     }
 
     // IDEs usados pelo verifyPlugin (verificador de compatibilidade da JetBrains).
+    // Checamos as pontas da faixa suportada: o piso (sinceBuild) e uma build recente.
     pluginVerification {
         ides {
-            ide(IntelliJPlatformType.PyCharmCommunity, "2024.2")
+            ide(IntelliJPlatformType.PyCharmCommunity, "2023.3")
+            ide(IntelliJPlatformType.PyCharmCommunity, "2025.3")
         }
     }
 
@@ -76,4 +85,11 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    // Gera bytecode Java 17 para o plugin carregar nas IDEs anteriores à 2024.2
+    // (que rodam no JBR 17), sem afetar as 2024.2+ (que aceitam 17). A compilação
+    // continua usando o JDK 21 do toolchain.
+    options.release = 17
 }
